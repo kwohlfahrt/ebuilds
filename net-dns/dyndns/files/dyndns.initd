@@ -23,7 +23,7 @@ checkconfig() {
 		ARGS="$ARGS $DYNDNS_IFACE $DYNDNS_URL"
 	fi
 
-	if $ALLOW_PRIVATE; then
+	if [ -n "$ALLOW_PRIVATE" ] && $ALLOW_PRIVATE; then
 		ARGS="$ARGS --allow-private"
 	fi
 
