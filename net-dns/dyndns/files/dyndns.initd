@@ -15,7 +15,7 @@ depend() {
 	return
 }
 
-checkconfig(){
+checkconfig() {
 	if [ -z "$DYNDNS_URL" ] || [ -z "$DYNDNS_IFACE" ]; then
 		eerror "You must set options in /etc/conf.d/dyndns"
 		return 1
@@ -27,7 +27,7 @@ checkconfig(){
 		ARGS="$ARGS --allow-private"
 	fi
 
-	if [-n "$PROTOCOLS" ]; then
+	if [ -n "$PROTOCOLS" ]; then
 		ARGS="$ARGS -$PROTOCOLS"
 	fi
 }
