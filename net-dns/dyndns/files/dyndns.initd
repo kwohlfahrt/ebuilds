@@ -1,0 +1,46 @@
+#!/sbin/runscript
+# Copyright 1999-2014 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: $
+
+PIDFILE="/var/run/dyndns.pid"
+ARGS=""
+
+depend() {
+	# dyndns will automatically wait for dns configuration, so if NetoworkManager is stopped
+	# it will quietly wait for a restart. If `need net` is set it will always be stopped and
+	# only restarted with NetworkManager if it is also in an active runlevel
+
+	# need net
+	return
+}
+
+checkconfig(){
+	if [ -z "$DYNDNS_URL" ] || [ -z "$DYNDNS_IFACE" ]; then
+		eerror "You must set options in /etc/conf.d/dyndns"
+		return 1
+	else
+		ARGS="$ARGS $DYNDNS_IFACE $DYNDNS_URL"
+	fi
+
+	if $ALLOW_PRIVATE; then
+		ARGS="$ARGS --allow-private"
+	fi
+
+	if [-n "$PROTOCOLS" ]; then
+		ARGS="$ARGS -$PROTOCOLS"
+	fi
+}
+
+start() {
+	ebegin "Starting dyndns"
+	checkconfig || return 1
+	start-stop-daemon --start --background --pidfile $PIDFILE --make-pidfile --exec /usr/bin/dyndns -- $ARGS
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping dyndns"
+	start-stop-daemon --stop --pidfile $PIDFILE --name dyndns
+	eend $?
+}
