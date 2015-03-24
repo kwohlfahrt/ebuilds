@@ -18,3 +18,5 @@ KEYWORDS="~amd64"
 RDEPEND=""
 DEPEND="${RDEPEND}
 	dev-python/setuptools[${PYTHON_USEDEP}]"
+
+PATCHES=( "${FILESDIR}/${P}-data-dir.diff" )
