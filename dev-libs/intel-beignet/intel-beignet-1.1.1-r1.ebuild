@@ -60,9 +60,6 @@ src_configure() {
 src_install() {
 	cmake-utils_src_install
 
-	insinto /etc/OpenCL/vendors/
-	doins intelbeignet.icd
-
 	dodoc -r  docs
 
 	dosym lib/beignet/libcl.so "${IBEIGNET_DIR}"/libOpenCL.so.1
