@@ -26,7 +26,7 @@ src_unpack() {
 
 src_install() {
 	cd "${BUILD_DIR}"
-	dolib bin/libHalide.a
+	dolib lib/libHalide.a
 	insinto /usr/include
 	doins include/*
 #	insinto /usr/lib/pkgconfig
