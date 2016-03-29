@@ -24,6 +24,13 @@ RDEPEND="xcb? ( x11-libs/libxcb )"
 
 S="${WORKDIR}/Vulkan-LoaderAndValidationLayers-sdk-${PV}"
 
+src_unpack() {
+	unpack ${A}
+	cd "${S}"
+	# Change the search path to match dev-util/glslang
+	epatch "${FILESDIR}/${PV}-glslang-spirv-hpp.patch"
+}
+
 src_configure() {
 	local mycmakeargs=(
 		$(cmake-utils_use_build xcb WSI_XCB_SUPPORT)
