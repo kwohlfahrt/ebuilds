@@ -18,3 +18,11 @@ IUSE=""
 
 DEPEND=""
 RDEPEND="${DEPEND}"
+
+src_install() {
+	# Match SPIRV-Tools
+	insinto /usr/include/SPIRV
+	doins SPIRV/spirv.hpp
+
+	cmake-utils_src_install
+}
