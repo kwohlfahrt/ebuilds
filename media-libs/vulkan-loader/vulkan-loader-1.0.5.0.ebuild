@@ -29,6 +29,7 @@ src_unpack() {
 	cd "${S}"
 	# Change the search path to match dev-util/glslang
 	epatch "${FILESDIR}/${PV}-glslang-spirv-hpp.patch"
+	sed -i -e 's/\("library_path": "\)./\1\/usr\/lib/' layers/linux/*.json
 }
 
 src_configure() {
@@ -43,3 +44,15 @@ src_configure() {
 	cmake-utils_src_configure
 }
 
+src_install() {
+	cd "${BUILD_DIR}"
+	dolib.so loader/libvulkan.so*
+	dolib.so layers/*.so
+
+	cd "${S}"
+	insinto /usr/include/vulkan
+	doins include/vulkan/*
+
+	insinto /usr/share/vulkan/explicit_layer.d
+	doins layers/linux/*.json
+}
