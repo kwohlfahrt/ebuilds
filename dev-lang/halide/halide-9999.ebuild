@@ -13,7 +13,7 @@ inherit eutils git-r3
 
 RDEPEND="
  virtual/opencl
- >=sys-devel/llvm-3.5[clang]
+ >=sys-devel/llvm-3.7[clang]
 "
 
 DEPEND="
