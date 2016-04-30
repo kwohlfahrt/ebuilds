@@ -1,0 +1,11 @@
+--- opencl.eselect	2012-02-17 14:03:59.000000000 +0000
++++ opencl.eselect	2016-04-30 13:00:27.635884750 +0100
+@@ -122,7 +122,7 @@
+ 
+ 	mkdir -p "${target}" || die "Failed to create ${target}"
+ 	pushd "${target}" &> /dev/null
+-		for file in cl_ext.h cl_gl_ext.h cl_gl.h cl.h cl_platform.h opencl.h cl.hpp; do
++		for file in cl_ext.h cl_gl_ext.h cl_gl.h cl.h cl_platform.h opencl.h cl.hpp cl_egl.h; do
+ 			for sdir in "$@"; do
+ 				if [[ -e ${sdir}/${file} ]]; then
+ 					upgrade_file "${sdir}/${file}" "${target}"

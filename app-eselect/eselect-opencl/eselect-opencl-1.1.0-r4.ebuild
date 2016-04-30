@@ -4,7 +4,7 @@
 
 EAPI=5
 
-inherit multilib
+inherit eutils multilib
 
 DESCRIPTION="Utility to change the OpenCL implementation being used"
 HOMEPAGE="https://www.gentoo.org/"
@@ -55,6 +55,10 @@ pkg_postinst() {
 	if [[ -n "${impl}"  && "${impl}" != '(none)' ]] ; then
 		eselect opencl set "${impl}"
 	fi
+}
+
+src_prepare() {
+	epatch "${FILESDIR}/egl.h.patch"
 }
 
 src_install() {
