@@ -67,10 +67,11 @@ src_install() {
 	#doman opencl.eselect.5
 
 	local headers=( opencl.h cl_platform.h cl.h cl_ext.h cl_gl.h cl_gl_ext.h cl_egl.h cl.hpp )
+	local include_dir="/usr/$(get_libdir)/OpenCL/global/include"
 
 	# We install all versions of OpenCL headers
 	for ver in 1.0 1.1 1.2 2.0 2.1; do
-		insinto /usr/$(get_libdir)/OpenCL/global/include/CL-${ver}
+		insinto ${include_dir}/CL-${ver}
 		for h in ${headers[@]}; do
 			local src=${DISTDIR}/CL-${ver}-${h}
 			if [ -e ${src} ]; then
@@ -81,7 +82,8 @@ src_install() {
 
 
 	# Create symlinks to newest. Maybe this should be switchable?
-	for f in ${D}/usr/$(get_libdir)/OpenCL/global/include/CL-2.1/*; do
-		dosym ${f} /usr/$(get_libdir)/OpenCL/global/include/CL/$(basename ${f})
+	dodir ${include_dir}/CL
+	for f in ${D}/${include_dir}/CL-2.1/*; do
+		dosym /${f#$D} ${include_dir}/CL/$(basename ${f})
 	done
 }
