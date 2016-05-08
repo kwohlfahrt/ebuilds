@@ -4,7 +4,7 @@
 
 EAPI=5
 
-inherit cmake-utils
+inherit cmake-utils eutils
 
 DESCRIPTION="Vulkan ICD loader and validation layers"
 HOMEPAGE="https://www.khronos.org/opengles/sdk/tools/Reference-Compiler/"
@@ -13,7 +13,7 @@ SRC_URI="https://github.com/KhronosGroup/Vulkan-LoaderAndValidationLayers/archiv
 LICENSE="BSD"
 SLOT="0"
 KEYWORDS="amd64"
-IUSE="+layers xcb"
+IUSE="+layers xcb vulkaninfo"
 
 DEPEND=">=dev-lang/python-3
         dev-util/cmake
@@ -25,19 +25,22 @@ RDEPEND="xcb? ( x11-libs/libxcb )"
 S="${WORKDIR}/Vulkan-LoaderAndValidationLayers-sdk-${PV}"
 
 src_unpack() {
-	unpack ${A}
-	cd "${S}"
+	unpack $A
+}
+
+src_prepare() {
 	# Change the search path to match dev-util/glslang
-	epatch "${FILESDIR}/glslang-spirv-hpp.patch"
-	sed -i -e 's/\("library_path": "\)./\1\/usr\/lib/' layers/linux/*.json
+	epatch "${FILESDIR}"/glslang-spirv-hpp.patch
+	sed -i -e 's@\("library_path": "\).@\1/usr/lib@' layers/linux/*.json
 }
 
 src_configure() {
 	local mycmakeargs=(
 		$(cmake-utils_use_build xcb WSI_XCB_SUPPORT)
 		$(cmake-utils_use_build layers LAYERS)
+		# Build all demos to get vulkaninfo
+		$(cmake-utils_use_build vulkaninfo DEMOS)
 		"-DBUILD_WSI_XLIB_SUPPORT=OFF"
-		"-DBUILD_DEMOS=OFF"
 		"-DBUILD_TESTS=OFF"
 	)
 
@@ -48,6 +51,8 @@ src_install() {
 	cd "${BUILD_DIR}"
 	dolib.so loader/libvulkan.so*
 	dolib.so layers/*.so
+
+	use vulkaninfo && dobin demos/vulkaninfo
 
 	cd "${S}"
 	insinto /usr/include/vulkan
