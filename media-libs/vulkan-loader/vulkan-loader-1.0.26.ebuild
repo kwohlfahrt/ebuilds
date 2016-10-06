@@ -22,7 +22,7 @@ REQUIRED_USE="vulkaninfo? ( Xlib xcb )"
 DEPEND=">=dev-lang/python-3
         dev-util/cmake
 		dev-util/glslang
-		dev-util/SPIRV-Tools
+		>=dev-util/SPIRV-Tools-1.1
 		${RDEPEND}"
 RDEPEND="xcb? ( x11-libs/libxcb )
 	     Xlib? ( x11-libs/libX11 )"
