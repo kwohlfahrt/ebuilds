@@ -16,5 +16,10 @@ SLOT="0"
 KEYWORDS="~amd64"
 IUSE=""
 
-DEPEND=""
+DEPEND="dev-util/SPIRV-Headers"
 RDEPEND="${DEPEND}"
+
+src_configure() {
+	local mycmakeargs=( -DSPIRV-Headers_SOURCE_DIR="/usr/" )
+	cmake-utils_src_configure
+}
