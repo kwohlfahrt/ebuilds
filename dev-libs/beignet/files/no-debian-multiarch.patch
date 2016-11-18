@@ -1,6 +1,5 @@
-diff -Nurb a/Beignet-1.0.3-Source/CMakeLists.txt b/Beignet-1.0.3-Source/CMakeLists.txt
---- a/Beignet-1.0.3-Source/CMakeLists.txt	2015-04-17 04:27:51.000000000 +0200
-+++ b/Beignet-1.0.3-Source/CMakeLists.txt	2015-05-20 20:59:17.895041760 +0200
+--- a/CMakeLists.txt	2015-04-17 04:27:51.000000000 +0200
++++ b/CMakeLists.txt	2015-05-20 20:59:17.895041760 +0200
 @@ -39,14 +39,9 @@
  
  SET(CMAKE_VERBOSE_MAKEFILE "false")

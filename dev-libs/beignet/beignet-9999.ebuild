@@ -1,18 +1,18 @@
-# Copyright 1999-2014 Gentoo Foundation
+# Copyright 1999-2016 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: $
+# $Id$
 
-EAPI=5
+EAPI=6
 
 PYTHON_COMPAT=( python2_7 )
-
-inherit python-any-r1 cmake-utils
 CMAKE_BUILD_TYPE="Release"
 
-DESCRIPTION="The Beignet GPGPU System for Intel Ivy-bridge GPUs"
-HOMEPAGE="http://wiki.freedesktop.org/www/Software/Beignet/"
+inherit python-any-r1 cmake-multilib flag-o-matic toolchain-funcs
 
-LICENSE="GPL-2"
+DESCRIPTION="OpenCL implementation for Intel GPUs"
+HOMEPAGE="https://01.org/beignet"
+
+LICENSE="LGPL-2.1+"
 SLOT="0"
 
 if [[ "${PV}" == "9999" ]]; then
@@ -20,50 +20,80 @@ if [[ "${PV}" == "9999" ]]; then
 	EGIT_REPO_URI="git://anongit.freedesktop.org/beignet"
 	KEYWORDS=""
 else
-	KEYWORDS="~amd64 ~x86"
-	SRC_URI="https://01.org/sites/default/files/${P/intel-/}-source.tar.gz -> ${P}.tar.gz"
+	KEYWORDS="~amd64"
+	SRC_URI="https://01.org/sites/default/files/${P}-source.tar.gz"
 	S=${WORKDIR}/Beignet-${PV}-Source
 fi
 
-DEPEND=">=sys-devel/gcc-4.6
-	${PYTHON_DEPS}"
-RDEPEND="app-eselect/eselect-opencl
+COMMON="${PYTHON_DEPS}
 	media-libs/mesa
 	sys-devel/clang
 	>=sys-devel/llvm-3.5
-	x11-libs/libdrm
+	>=x11-libs/libdrm-2.4.70[video_cards_intel]
 	x11-libs/libXext
 	x11-libs/libXfixes"
+RDEPEND="${COMMON}
+	app-eselect/eselect-opencl"
+DEPEND="${COMMON}
+	${PYTHON_DEPS}
+	virtual/pkgconfig"
+
+PATCHES=(
+	"${FILESDIR}"/no-debian-multiarch.patch
+	"${FILESDIR}"/${PN}-1.2.0_no-hardcoded-cflags.patch
+	"${FILESDIR}"/llvm-terminfo.patch
+)
+
+DOCS=(
+	docs/.
+)
+
+pkg_pretend() {
+	if [[ ${MERGE_TYPE} != "binary" ]]; then
+		if tc-is-gcc; then
+			if [[ $(gcc-major-version) -eq 4 ]] && [[ $(gcc-minor-version) -lt 6 ]]; then
+				eerror "Compilation with gcc older than 4.6 is not supported"
+				die "Too old gcc found."
+			fi
+		fi
+	fi
+}
 
 pkg_setup() {
 	python_setup
 }
 
-IBEIGNET_DIR=/usr/$(get_libdir)/OpenCL/vendors/intel-beignet
-
 src_prepare() {
-	# disable tests for now
-	sed -i "s/ADD_SUBDIRECTORY(utests)/#ADD_SUBDIRECTORY(utests)/" CMakeLists.txt || die "sed failed"
-	# disable debian multiarch
-	epatch "${FILESDIR}"/no-debian-multiarch-1.0.3.patch
+	# See Bug #593968
+	append-flags -fPIC
 
-	echo "${IBEIGNET_DIR}/lib/beignet/libcl.so" > intelbeignet.icd
 	cmake-utils_src_prepare
+	# We cannot run tests because they require permissions to access
+	# the hardware, and building them is very time-consuming.
+	cmake_comment_add_subdirectory utests
 }
 
-src_configure() {
-	local mycmakeargs=( -DCMAKE_INSTALL_PREFIX="${IBEIGNET_DIR}/" )
+multilib_src_configure() {
+	VENDOR_DIR="/usr/$(get_libdir)/OpenCL/vendors/${PN}"
+
+	local mycmakeargs=(
+		-DCMAKE_INSTALL_PREFIX="${VENDOR_DIR}"
+	)
 
 	cmake-utils_src_configure
 }
 
-src_install() {
+multilib_src_install() {
+	VENDOR_DIR="/usr/$(get_libdir)/OpenCL/vendors/${PN}"
+
 	cmake-utils_src_install
 
-	dodoc -r  docs
+	insinto /etc/OpenCL/vendors/
+	echo "${VENDOR_DIR}/lib/${PN}/libcl.so" > "${PN}-${ABI}.icd" || die "Failed to generate ICD file"
+	doins "${PN}-${ABI}.icd"
 
-	dosym lib/beignet/libcl.so "${IBEIGNET_DIR}"/libOpenCL.so.1
-	dosym lib/beignet/libcl.so "${IBEIGNET_DIR}"/libOpenCL.so
-	dosym lib/beignet/libcl.so "${IBEIGNET_DIR}"/libcl.so.1
-	dosym lib/beignet/libcl.so "${IBEIGNET_DIR}"/libcl.so
+	dosym "lib/${PN}/libcl.so" "${VENDOR_DIR}"/libOpenCL.so.1
+	dosym "lib/${PN}/libcl.so" "${VENDOR_DIR}"/libOpenCL.so
+	dosym "lib/${PN}/libcl.so" "${VENDOR_DIR}"/libcl.so.1
+	dosym "lib/${PN}/libcl.so" "${VENDOR_DIR}"/libcl.so
 }
