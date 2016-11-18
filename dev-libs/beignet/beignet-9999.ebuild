@@ -42,6 +42,7 @@ PATCHES=(
 	"${FILESDIR}"/no-debian-multiarch.patch
 	"${FILESDIR}"/${PN}-1.2.0_no-hardcoded-cflags.patch
 	"${FILESDIR}"/llvm-terminfo.patch
+	"${FILESDIR}"/${PN}-1.2.1_no-icd.patch
 )
 
 DOCS=(
