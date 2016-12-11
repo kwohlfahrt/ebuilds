@@ -39,15 +39,13 @@ RDEPEND="xcb? ( x11-libs/libxcb )
 
 DOCS=( README.md LICENSE.txt )
 
-# Change the search path to match dev-util/glslang
-PATCHES=( "${FILESDIR}"/glslang-spirv-hpp.patch )
-
 multilib_src_configure() {
 	local mycmakeargs=(
 		-DCMAKE_SKIP_RPATH=True
 		-DBUILD_TESTS=False
 		-DBUILD_VKJSON=False
 		-DBUILD_LOADER=True
+		-DBUILD_WSI_MIR_SUPPORT=False
 
 		-DBUILD_WSI_XCB_SUPPORT=$(usex xcb)
 		-DBUILD_WSI_XLIB_SUPPORT=$(usex Xlib)
