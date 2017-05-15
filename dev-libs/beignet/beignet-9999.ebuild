@@ -1,10 +1,9 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 1999-2017 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Id$
 
 EAPI=6
 
-PYTHON_COMPAT=( python2_7 )
+PYTHON_COMPAT=( python{2_7,3_4,3_5} )
 CMAKE_BUILD_TYPE="Release"
 
 inherit python-any-r1 cmake-multilib flag-o-matic toolchain-funcs
@@ -14,6 +13,7 @@ HOMEPAGE="https://01.org/beignet"
 
 LICENSE="LGPL-2.1+"
 SLOT="0"
+IUSE="ocl-icd ocl20"
 
 if [[ "${PV}" == "9999" ]]; then
 	inherit git-r3
@@ -25,10 +25,10 @@ else
 	S=${WORKDIR}/Beignet-${PV}-Source
 fi
 
-COMMON="${PYTHON_DEPS}
-	media-libs/mesa
-	sys-devel/clang
-	>=sys-devel/llvm-3.5
+COMMON="media-libs/mesa
+	sys-devel/clang:0=
+	>=sys-devel/llvm-3.6:0=
+	ocl20? ( >=sys-devel/llvm-3.9:0= )
 	>=x11-libs/libdrm-2.4.70[video_cards_intel]
 	x11-libs/libXext
 	x11-libs/libXfixes"
@@ -36,13 +36,14 @@ RDEPEND="${COMMON}
 	app-eselect/eselect-opencl"
 DEPEND="${COMMON}
 	${PYTHON_DEPS}
+	ocl-icd? ( dev-libs/ocl-icd )
 	virtual/pkgconfig"
 
 PATCHES=(
-	"${FILESDIR}"/no-debian-multiarch.patch
+	"${FILESDIR}"/${P}-no-debian-multiarch.patch
+	"${FILESDIR}"/${P}-oclicd_no_upstream_icdfile.patch
 	"${FILESDIR}"/${PN}-1.2.0_no-hardcoded-cflags.patch
 	"${FILESDIR}"/llvm-terminfo.patch
-	"${FILESDIR}"/${PN}-1.2.1_no-icd.patch
 )
 
 DOCS=(
@@ -79,6 +80,8 @@ multilib_src_configure() {
 
 	local mycmakeargs=(
 		-DCMAKE_INSTALL_PREFIX="${VENDOR_DIR}"
+		-DOCLICD_COMPAT=$(usex ocl-icd)
+		-DENABLE_OPENCL_20=$(usex ocl20)
 	)
 
 	cmake-utils_src_configure
