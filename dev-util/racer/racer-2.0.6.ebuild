@@ -8,7 +8,7 @@ inherit eutils
 
 DESCRIPTION="Rust Code Completion utility "
 HOMEPAGE="https://github.com/phildawes/racer"
-SRC_URI="https://github.com/phildawes/racer/archive/v1.1.0.tar.gz -> ${P}.tar.gz"
+SRC_URI="https://github.com/phildawes/racer/archive/${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="MIT"
 SLOT="0"
