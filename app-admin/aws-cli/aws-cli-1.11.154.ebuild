@@ -15,13 +15,16 @@ SLOT="0"
 KEYWORDS="~amd64"
 IUSE="test"
 
-RDEPEND="=dev-python/botocore-1.5.27[${PYTHON_USEDEP}]
+RDEPEND="=dev-python/botocore-1.7.12[${PYTHON_USEDEP}]
 	>=dev-python/colorama-0.2.5[${PYTHON_USEDEP}]
 	<=dev-python/colorama-0.3.7[${PYTHON_USEDEP}]
 	>=dev-python/docutils-0.10[${PYTHON_USEDEP}]
 	>=dev-python/rsa-3.1.2[${PYTHON_USEDEP}]
-	dev-python/pyyaml[${PYTHON_USEDEP}]
-	dev-python/s3transfer[${PYTHON_USEDEP}]"
+	<=dev-python/rsa-3.5.0[${PYTHON_USEDEP}]
+	>=dev-python/pyyaml-3.10[${PYTHON_USEDEP}]
+	<=dev-python/pyyaml-3.12[${PYTHON_USEDEP}]
+	>=dev-python/s3transfer-0.1.9[${PYTHON_USEDEP}]
+	<dev-python/s3transfer-0.2.0[${PYTHON_USEDEP}]"
 DEPEND="${RDEPEND}
 	test? (
 		dev-python/mock[${PYTHON_USEDEP}]
